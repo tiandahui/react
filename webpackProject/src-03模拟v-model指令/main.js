@@ -1,9 +1,10 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './app'
-import './assets/index.scss'
 
-ReactDOM.render(<App />,
+let demo = <h1>1111</h1>
+ReactDOM.render(
+  <App />,
   document.getElementById('root'),
   () => {
     console.log('渲染成功')
@@ -87,18 +88,4 @@ ReactDOM.render(<App />,
             6：UI组件
             7：容器组件
             .....
-
-
-
-      组件传值：
-        1：父传子
-            传递：当子组件在父组件中当做标签使用时，给子组件绑定一个自定义属性，值为需要传递的数据
-            接收：当子组件在父组件中当做标签使用时，在子组件中通过this.props进行接收
-        2：子传父
-            传递：在子组件中通过this.props.自定义属性将值进行传递
-            接收：将子组件绑定一个自定义属性，值为需要传递的函数
-        3：非父子
-            通过手动封装时间订阅，传值的一方调用emit
-            接收值的一方调用on
-
  */

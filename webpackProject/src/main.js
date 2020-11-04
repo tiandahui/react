@@ -10,95 +10,127 @@ ReactDOM.render(<App />,
   }
 )
 
-/* ReactDOM.render(
-  demo,
-  document.getElementById('root'),
-  () => {
-    console.log('渲染成功')
-  }
-  )
+/*
+  生命周期
+    constructor  （常）
+      组件初始化时会执行当前生命周期，当前生命周期的主要作用是用来存储当前组件所需要的一些状态。状态保存在this.state中
+
+      另外需要特别注意一点，当编写了constructor的时候，必须要谢super，否则this的指向会发生错误
+
+      当前生命周期访问不到this.props,若想要访问需要在constructor和super中传入props
 
 
-  react中如何创建组件
-     react中通过class关键字来创建组件,React这个对象身上有一个属性Component，这个具有组件的父类
-     如果我们想要创建组件的时候必须通过继承这个父类来创建组件
+    componentWillMount：挂载前（一次）
+      当前生命周期是组件创建前会执行，当前生命周期数据和模板还未结合状态，因此我们可以在当前生命周期中
+      对组件的状态进行修改
 
-     组件创建时需要注意的地方：
-      1： 组件名称必须大写
-      2： 组件中必须有render函数，这个函数必须返回一个jsx语法，只能有一个元素
+      尽量不要在当前生命周期中执行this.setState, 因为当前生命周期执行完毕后，下一个生命周期就是render，减少不必要的性能消耗
 
+      除此之外当前生命周期中还可以接受到外部的属性
 
-      render是一个生命周期，用来渲染jsx语法以及虚拟DOM的对比，render函数会多次执行，只要this.state或者this.props发生改变就执行
+      在17.0中废除了此声明周期
 
-      react中事件的优化
-        1：如果在不需要传递参数的情况下，可以将函数在constructor中提前定义，以及提前改变this指向
+    render（多次执行）  （常）
 
-              constructor() {
-                super();
-                this.handleClick = this.handleClick.bind(this)
-              }
+      render函数将数据和模板相结合，并在会在缓存中保存一份，当this.state和this.props发生改变的时候
+      render函数会将上次缓存结果和这次渲染进行对比（diff算法：新旧两个虚拟dom的对比）
 
-              render() {
-                return (
-                  <div>
-                    {
-                      arr.map((item, index) => {
-                        // 调用方法的时候无法使用（）进行传参，会导致自执行后，点击无效
-                        // 需要用bind改变this
-                        return <p key={index} onClick={this.handleClick}>{item}</p>
-                      })
-                    }
-                  </div>
-                )
-              }
+      render函数的渲染次数决定了当前组件的优化程度
 
-      constructor:
-              也是组件中的一个生命周期，如果创建组件时写了constructor必须写super，
-              若不写this指向会发生问题
+    componentDidMount：挂载 （一次）  （常）
+      当前生命周期是数据和模板进行结合完毕并且已经挂在到页面上了，在当前生命周期中我们可以访问到真实的dom结构
 
-
-              存放当前组件所需要的一些状态
-
-
-              this.state = {} 状态
-
-      this.setState:
-          用来修改this.state中的数据，当this.setState调用之后，render函数就会重新执行
-
-          基本语法：
-            1:(对象形式)   this.setState({
-                            message: xxx
-                          })
-            2:(函数形式)   return {
-                            message: 1000
-                          }
-                          return {
-                            message: state.message.split('').reverse().join('')
-                          }
-      this.setState是异步执行， 第二个参数为一个回调，用于验证数据是否修改成功，获取数据更新后最新的dom结构
-
-
-      组件分类：
-            1：类组件
-            2：函数组件
-            3：受控组件
-            4：非受控组件
-            5：高阶组件
-            6：UI组件
-            7：容器组件
-            .....
+      如何访问到真实的dom结构？
+        1. <h2 ref='属性'></h2>
+          this.refs.属性
+        2. <h2 ref={el => this.属性 = el}></h2>
+          this.属性
+      我们可以在当前生命周期中做方法的实例化（swiper，echarts，better-scroll）
 
 
 
-      组件传值：
-        1：父传子
-            传递：当子组件在父组件中当做标签使用时，给子组件绑定一个自定义属性，值为需要传递的数据
-            接收：当子组件在父组件中当做标签使用时，在子组件中通过this.props进行接收
-        2：子传父
-            传递：在子组件中通过this.props.自定义属性将值进行传递
-            接收：将子组件绑定一个自定义属性，值为需要传递的函数
-        3：非父子
-            通过手动封装时间订阅，传值的一方调用emit
-            接收值的一方调用on
+    componentWillReceiveProps:（17.0被废除）
+      当this.state发生改变的时候回执行当前的生命周期函数，有一个参数为新的props
+
+
+    shouldComponentUpdate：  （常）
+      当this.state和this.props发生改变时会执行当前生命周期，以及react的性能优化也需要在当前生命周期中去做
+      当数据发生改变时会执行，当前生命周期必须要返回一个true或者false，如果为true则继续执行下面的生命周期，否则停止执行生命周期
+
+      当前生命周期中会有2个参数，一个是新的state，一个是新的props,  我们可以比较新值和旧值来决定
+      return true/false这样可以减少render函数渲染的次数
+
+
+
+    componentWillUpdate：更新前（17.0废除掉了）
+      此生命周期有2个参数，一个是新的props，一个是新的state，在此周期中对更新的数据做最后的修改或者过滤
+
+      不要再此生命周期中调用this.setState
+
+
+    componentDidUpdate：更新
+      当前声明周期是数据和模板相结合，在当前生命周期中我们可以访问到更新后最新的dom元素
+      以及还可以对之前的数据做一个缓存，因为当前声明周期中有2个参数，一个是旧的props，一个是旧的state
+
+
+
+    componentWillUnmount：销毁  （常）
+      当组件销毁的时候会执行当前生命周期，我们需要在生命周期中做一些销毁操作
+      例如：定时器清除，事件移除，事件解绑
+
+
+  面试题：
+    1. react中组件创建时哪些生命周期会执行？
+        答：constructor
+            componentWillMount
+            render
+            componentDidMount
+
+
+    2. react哪些生命周期执行多次，哪些生命周期会执行一次？
+        一次：
+          constructor
+          conponentWillMount
+          componentDidMount
+          componentWillUnMount
+
+        多次
+          componentWillReceiveProps
+          shouleComponentUpdate
+          componentWillUpdate
+          render
+          componentDidUpdate
+
+
+    3. render函数什么时候会执行？
+        答：当this.state和this.props发生改变的时候会执行
+
+
+    4. 当this.state和this.props发生改变后会执行哪些生命周期？
+        答： this.state:
+              shouleComponentUpdate
+              componentWillUpdate
+              render
+              componentDidUpdate
+            this.state:
+              componentWillReceiveProps
+              shouleComponentUpdate
+              componentWillUpdate
+              render
+              componentDidUpdate
+
+
+    5. 谈谈你对shouldComponentUpdate的理解，以及性能优化？
+        答： 当this.state和this.props发生改变时会执行当前生命周期，以及react的性能优化也需要在当前生命周期中去做
+            当数据发生改变时会执行，当前生命周期必须要返回一个true或者false，如果为true则继续执行下面的生命周期，否则停止执行生命周期
+
+            当前生命周期中会有2个参数，一个是新的state，一个是新的props,  我们可以比较新值和旧值来决定
+            return true/false这样可以减少render函数渲染的次数
+
+
+    6. react中ajax数据请求为什么要在componentDidMount中进行，而不再componentWillMount中
+        答： 1. 被废除
+             2. componentWillMount有可能会造成阻塞的现象，导致组件会渲染多次
+             3. componentWillMount在next服务端一般用来进行数据的请求
 
  */

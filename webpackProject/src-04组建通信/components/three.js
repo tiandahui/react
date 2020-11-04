@@ -12,6 +12,7 @@ export default class Three extends Component {
     return (
       <div className='three'>
         <h2>three组件</h2>
+        <button onClick={this.send}>发送给two组件</button>
       </div>
     )
   }

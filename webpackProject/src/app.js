@@ -1,32 +1,27 @@
 import React from 'react';
 import One from './components/one'
-import Two from './components/two'
 
 class App extends React.Component {
   constructor() {
     super()
     this.state = {
-      appInfo: '我是父组件',
-      twoInfo: ''
+      val: 'app组件',
+      flag: true
     }
   }
 
   render() {
-    let { appInfo: info } = this.state
     return (
       <div className='app' >
-        <h2>app组件</h2>
-        <h3>接受到子组件信息为：{this.state.twoInfo}</h3>
-        <One info={info}></One>
-        <Two handle={this.handleMessage}></Two>
+        {this.state.flag ? <One title={this.state.val}></One> : ''}
+        <button onClick={this.click}>点击</button>
       </div >
     )
   }
-  handleMessage = (info) => {
-    console.log(info)
-    console.log(this)
+
+  click = () => {
     this.setState({
-      twoInfo: info
+      flag: false
     })
   }
 }
